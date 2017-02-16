@@ -1,0 +1,2 @@
+# Authentication
+POST    /auth       controllers.AuthController.auth
