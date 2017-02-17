@@ -7,7 +7,6 @@ scalaVersion := "2.11.8"
 lazy val root = project.in(file(".")).enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq(
-  jdbc,
   "org.xerial" % "sqlite-jdbc" % "3.16.1",
   "com.typesafe.play" % "play-slick_2.11" % "2.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",

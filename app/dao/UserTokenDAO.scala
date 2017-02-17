@@ -4,7 +4,9 @@ import java.util.Date
 import javax.inject.{Inject, Singleton}
 
 import models.UserToken
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.db.NamedDatabase
 import slick.driver.JdbcProfile
 import slick.lifted.{TableQuery, Tag}
 import slick.driver.SQLiteDriver.api._
@@ -15,12 +17,16 @@ import scala.concurrent.Future
   * Created by Ruslan Komarov on 16.02.17.
   */
 @Singleton
-class UserTokenDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class UserTokenDAO @Inject()(@NamedDatabase("storage") dbConfigProvider: DatabaseConfigProvider) {
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
+
   private val userTokens = TableQuery[UserTokensTable]
 
-  def findByToken(token: String) : Future[Option[UserToken]] =  db.run(userTokens.filter(_.token === token).result.headOption)
+  def findByToken(token: String) : Future[Option[UserToken]] =  dbConfig.db.run(userTokens.filter(_.token === token).result.headOption)
 
-  def insert(userToken: UserToken): Future[Unit] = db.run(userTokens += userToken).map(_ => ())
+  def insert(userToken: UserToken): Future[Unit] = dbConfig.db.run(userTokens += userToken).map(_ => ())
+
+  implicit val dateColumnType = MappedColumnType.base[Date, Long](d => d.getTime, d => new Date(d))
 
   private class UserTokensTable(tag: Tag) extends Table[UserToken](tag, "USERTOKENS") {
       def token = column[String]("TOKEN", O.PrimaryKey)

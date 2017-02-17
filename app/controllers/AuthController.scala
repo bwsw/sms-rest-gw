@@ -1,12 +1,14 @@
 package controllers
 
 import java.util.{Date, UUID}
-import javax.inject.Inject
+import javax.inject._
 
-import dao.UserTokenDAO
+import dao.{SendLogDAO, UserTokenDAO}
 import models.UserToken
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import utils.LdapAuthService
 
 import scala.util.{Failure, Success}
@@ -14,7 +16,7 @@ import scala.util.{Failure, Success}
 /**
   * Created by Ruslan Komarov on 15.02.17.
   */
-class AuthController @Inject() (userTokenDAO: UserTokenDAO)extends Controller {
+class AuthController @Inject() (userTokenDAO: UserTokenDAO) extends Controller {
 
   case class Credentials(username: String, password: String)
 
@@ -36,8 +38,8 @@ class AuthController @Inject() (userTokenDAO: UserTokenDAO)extends Controller {
           case Failure(_) => BadRequest("Invalid credentials").as(JSON)
           case Success(r) =>  {
             val userToken = new UserToken(UUID.randomUUID().toString, c.username, new Date())
-            userTokenDAO.insert(userToken)
-            Ok(r.toString()).as(JSON)
+            val result = userTokenDAO.insert(userToken)
+            Ok(r.toString() + " ").as(JSON)
           }
         }
       }
