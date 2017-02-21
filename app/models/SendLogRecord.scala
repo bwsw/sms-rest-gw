@@ -1,9 +1,9 @@
 package models
 
 
-import java.util.Date
+import org.joda.time.DateTime
 
 /**
   * Created by Ruslan Komarov on 16.02.17.
   */
-case class SendLogRecord(username: String, sender: String, destination: String, message: String, sendtime: Date)
+case class SendLogRecord(username: String, sender: String, destination: String, message: String, sendtime: DateTime)

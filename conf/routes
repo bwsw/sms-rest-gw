@@ -1,2 +1,4 @@
 # Authentication
 POST    /auth       controllers.AuthController.auth
+POST    /send       controllers.SendMessageController.send
+GET     /logs       controllers.SendLogController.logs(from: Long, to: Long)

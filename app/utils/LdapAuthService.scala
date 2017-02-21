@@ -1,6 +1,6 @@
 package utils
 
-import com.unboundid.ldap.sdk.LDAPConnection
+import com.unboundid.ldap.sdk.{LDAPConnection, SearchRequest, SearchScope}
 
 import scala.util.Try
 
@@ -9,10 +9,11 @@ import scala.util.Try
   */
 object LdapAuthService {
 
-  def connect (username: String, password: String) = {
+  lazy val ldapService: LDAPConnection = new LDAPConnection("ldap.com", 389)
+
+  def authenticate(username: String, password: String) = {
     Try {
-      val ldap: LDAPConnection = new LDAPConnection("ldap.com", 389)
-      ldap.bind(username, password)
+      ldapService.bind(username, password)
     }
   }
 }
