@@ -1,20 +1,20 @@
-package dao
+package com.bwsw.dao
 
 import javax.inject.{Inject, Singleton}
 
-import models.SendLogRecord
+import com.bwsw.models.SendLogRecord
+import org.joda.time.DateTime
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.db.NamedDatabase
 import slick.driver.JdbcProfile
-import slick.lifted.{TableQuery, Tag}
 import slick.driver.SQLiteDriver.api._
-import org.joda.time.DateTime
+import slick.lifted.{TableQuery, Tag}
 
 import scala.concurrent.Future
 
 /**
-  * Created by Ruslan Komarov on 16.02.17.
+  * Data Access Object for sent messages logs
   */
 @Singleton
 class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: DatabaseConfigProvider) {
@@ -24,8 +24,20 @@ class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: Database
 
   private val sendLogs = TableQuery[SendLogsTable]
 
+  /**
+    * Insert SendLogRecord to database
+    * @param sendLogRecord record to insert
+    * @return future object
+    */
   def insert(sendLogRecord: SendLogRecord): Future[Unit] = dbConfig.db.run(sendLogs += sendLogRecord).map(_ => ())
 
+  /**
+    * Select log records from database with filtering by parameters
+    * @param username username filter
+    * @param from from (time) filter
+    * @param to to (time) filter
+    * @return log records according to select parameters
+    */
   def selectByUserAndRange(username: String, from: DateTime, to: DateTime): Future[Seq[SendLogRecord]] = {
     val query = sendLogs.filter(_.username === username).filter(d => d.sendtime >= from && d.sendtime < to).result
     dbConfig.db.run(query)

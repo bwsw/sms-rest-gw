@@ -1,16 +1,22 @@
-package utils.SmsGateway
+package com.bwsw.utils.SmsGateway
+
 import java.util
 
+import com.bwsw.models.Message
 import com.plivo.helper.api.client.RestAPI
 import com.typesafe.config.ConfigFactory
-import models.Message
 import play.api.http.Status
 
 
 /**
-  * Created by Ruslan Komarov on 17.02.17.
+  * Plivo implementation of SmsGateway service
   */
 class PlivoSmsGateway extends SmsGateway {
+  /**
+    * Method implementation with usage of official Java Plivo library
+    * @param message sent message
+    * @return Left for errors while sending, Right for successful sending
+    */
   override def sendMessage(message: Message): Either[String, String] = {
     val auth_id = ConfigFactory.load().getString("plivo.auth.id")
     val auth_token = ConfigFactory.load().getString("plivo.auth.token")

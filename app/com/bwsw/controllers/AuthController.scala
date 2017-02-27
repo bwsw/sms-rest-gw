@@ -1,25 +1,28 @@
-package controllers
+package com.bwsw.controllers
 
-
+import com.bwsw.models.User
+import com.bwsw.utils.LdapAuthService
 import com.typesafe.config.ConfigException
 import com.unboundid.ldap.sdk.LDAPException
-import models.User
 import pdi.jwt.JwtSession
-import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
-import utils.LdapAuthService
+import play.api.mvc.{Action, Controller}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 /**
-  * Created by Ruslan Komarov on 15.02.17.
+  * Authenticate controller
   */
 class AuthController extends Controller {
   case class Credentials(username: String, password: String)
   implicit val credentialsReads = Json.reads[Credentials]
 
+  /**
+    * Authenticate method.
+    * Receive POST request (/auth) with arguments: username and password; check credentials using LdapAuthService.
+    * @return response with token or error with description
+    */
   def auth = Action.async(parse.json) { request =>
     request.body.validate[Credentials] match {
       case JsError(_) => Future.successful(BadRequest(Json.obj("error" -> "Invalid json")).as(JSON))

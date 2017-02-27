@@ -1,29 +1,36 @@
-package controllers
+package com.bwsw.controllers
 
 import javax.inject.Inject
 
+import com.bwsw.controllers.Secured.UserAction
+import com.bwsw.dao.SendLogDAO
+import com.bwsw.models.{Message, SendLogRecord}
+import com.bwsw.utils.SmsGateway.SmsGateway
 import com.typesafe.config.ConfigException
-import controllers.Secured.UserAction
-import dao.SendLogDAO
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.mvc.Controller
-import models.{Message, SendLogRecord}
-import org.joda.time.DateTime
-import utils.SmsGateway.SmsGateway
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Created by Ruslan Komarov on 17.02.17.
+  * Sending messages controller
   */
 class SendMessageController @Inject() (sendLogDAO: SendLogDAO) extends Controller {
+
+  /**
+    * Sending messages method.
+    * Receive POST request (/send) with arguments: sender, destination and text.
+    * Send messages using implementation of SmsGateway trait.
+    * @return response with sending status or error with description
+    */
   def send = UserAction.async(parse.json) { implicit request =>
     request.body.validate[Message] match {
       case _: JsError => Future.successful(BadRequest(Json.obj("error" -> "Invalid json")).as(JSON))
-      case JsSuccess(m, _) => {
-        SmsGateway.getSmsGateway() map { service =>
-          Try(service.sendMessage(m)) match {
+      case JsSuccess(m, _) => SmsGateway.getSmsGateway fold (
+          error => Future.successful(BadRequest(Json.obj("error" -> error)).as(JSON)),
+          service => Try(service.sendMessage(m)) match {
             case Success(result) => result.fold(
               error => Future.successful(BadRequest(Json.obj("error" -> error)).as(JSON)),
               result => {
@@ -36,8 +43,7 @@ class SendMessageController @Inject() (sendLogDAO: SendLogDAO) extends Controlle
               case _ => Future.successful(BadRequest(Json.obj("error" -> ("Unknown error: " + e.toString))).as(JSON))
             }
           }
-        } getOrElse Future.successful(BadRequest(Json.obj("error" -> "Bad application config: missing [app.ldap] setting")).as(JSON))
-      }
+      )
     }
   }
 }

@@ -1,13 +1,19 @@
-package utils
+package com.bwsw.utils
 
 import com.unboundid.ldap.sdk.LDAPConnection
 
 import scala.util.Try
 
 /**
-  * Created by Ruslan Komarov on 15.02.17.
+  * Authentication service using LDAP
   */
 object LdapAuthService {
+  /**
+    * Try to authenticate to the LDAP service using parameters
+    * @param username username for authentication
+    * @param password password for authentication
+    * @return Success or Failure (in case of some exception)
+    */
   def authenticate(username: String, password: String) = {
     import com.typesafe.config.ConfigFactory
     Try {
