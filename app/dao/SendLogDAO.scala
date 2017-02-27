@@ -39,6 +39,6 @@ class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: Database
     def message = column[String]("MESSAGE")
     def sendtime = column[DateTime]("SENDTIME")
 
-    def * = (username, sender, destination, message, sendtime) <> (SendLogRecord.tupled, SendLogRecord.unapply)
+    def * = (username, sender, destination, message, sendtime) <> ((SendLogRecord.apply _).tupled, SendLogRecord.unapply)
   }
 }

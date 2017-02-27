@@ -8,5 +8,5 @@ import play.api.libs.json.Json
 case class Message(sender: String, destination: String, text: String)
 
 object Message {
-  implicit def message = Json.reads[Message]
+  implicit val messageFormat = Json.format[Message]
 }
