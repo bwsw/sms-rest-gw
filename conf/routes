@@ -1,4 +1,3 @@
-# Authentication
 POST    /auth       com.bwsw.controllers.AuthController.auth
 POST    /send       com.bwsw.controllers.SendMessageController.send
 GET     /logs       com.bwsw.controllers.SendLogController.logs(from: Long ?= 0, to: Long ?= System.currentTimeMillis / 1000)
