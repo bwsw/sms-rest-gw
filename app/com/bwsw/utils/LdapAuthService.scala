@@ -20,7 +20,9 @@ object LdapAuthService {
       val host = ConfigFactory.load().getString("app.ldap.host")
       val port = ConfigFactory.load().getInt("app.ldap.port")
 
-      new LDAPConnection(host, port).bind(username, password)
+      val ldapConnection = new LDAPConnection(host, port)
+      ldapConnection.bind(username, password)
+      ldapConnection.close()
     }
   }
 }

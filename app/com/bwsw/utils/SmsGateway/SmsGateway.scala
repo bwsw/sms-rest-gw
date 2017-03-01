@@ -27,11 +27,11 @@ object SmsGateway {
   def getSmsGateway(): Either[String, SmsGateway] = {
     import com.typesafe.config.ConfigFactory
 
-    Try(ConfigFactory.load().getString("app.gateway")) map {
+    Try(ConfigFactory.load().getString("app.gateway.service")) map {
       serviceName =>
         Try(Class.forName(serviceName).newInstance().asInstanceOf[SmsGateway]) map {
           instance => Right(instance)
-        } getOrElse Left("Bad application config: missing or incorrect [app.gateway] setting")
-    } getOrElse Left("Bad application config: missing [app.ldap] setting")
+        } getOrElse Left("Bad application config: incorrect [app.gateway.service] setting")
+    } getOrElse {Left("Bad application config: missing [app.gateway.service] setting")}
   }
 }

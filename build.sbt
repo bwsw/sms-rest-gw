@@ -4,7 +4,7 @@ version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
-lazy val root = project.in(file(".")).enablePlugins(PlayScala)
+lazy val root = project.in(file(".")).enablePlugins(PlayScala, DockerPlugin)
 
 libraryDependencies ++= Seq(
   "org.xerial" % "sqlite-jdbc" % "3.16.1",

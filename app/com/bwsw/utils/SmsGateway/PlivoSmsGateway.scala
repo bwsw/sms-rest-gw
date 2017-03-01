@@ -18,8 +18,8 @@ class PlivoSmsGateway extends SmsGateway {
     * @return Left for errors while sending, Right for successful sending
     */
   override def sendMessage(message: Message): Either[String, String] = {
-    val auth_id = ConfigFactory.load().getString("plivo.auth.id")
-    val auth_token = ConfigFactory.load().getString("plivo.auth.token")
+    val auth_id = ConfigFactory.load().getString("app.gateway.auth.id")
+    val auth_token = ConfigFactory.load().getString("app.gateway.auth.token")
 
     val restAPI = new RestAPI(auth_id, auth_token, "v1")
 

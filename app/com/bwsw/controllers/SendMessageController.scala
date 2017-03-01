@@ -34,7 +34,7 @@ class SendMessageController @Inject() (sendLogDAO: SendLogDAO) extends Controlle
             case Success(result) => result.fold(
               error => Future.successful(BadRequest(Json.obj("error" -> error)).as(JSON)),
               result => {
-                sendLogDAO.insert(SendLogRecord(request.user.username, m.sender, m.destination, m.text, DateTime.now()))
+                sendLogDAO.insert(SendLogRecord(request.user.username, m.sender, m.destination, m.text, DateTime.now().getMillis / 1000))
                 Future.successful(Ok(Json.obj("message" -> result)).as(JSON))
               }
             )

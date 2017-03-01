@@ -3,7 +3,6 @@ package com.bwsw.dao
 import javax.inject.{Inject, Singleton}
 
 import com.bwsw.models.SendLogRecord
-import org.joda.time.DateTime
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.db.NamedDatabase
@@ -19,8 +18,6 @@ import scala.concurrent.Future
 @Singleton
 class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: DatabaseConfigProvider) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
-
-  implicit val dateColumnType = MappedColumnType.base[DateTime, Long](d => d.getMillis / 1000, d => new DateTime(d * 1000))
 
   private val sendLogs = TableQuery[SendLogsTable]
 
@@ -38,7 +35,7 @@ class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: Database
     * @param to to (time) filter
     * @return log records according to select parameters
     */
-  def selectByUserAndRange(username: String, from: DateTime, to: DateTime): Future[Seq[SendLogRecord]] = {
+  def selectByUserAndRange(username: String, from: Long, to: Long): Future[Seq[SendLogRecord]] = {
     val query = sendLogs.filter(_.username === username).filter(d => d.sendtime >= from && d.sendtime < to).result
     dbConfig.db.run(query)
   }
@@ -49,7 +46,7 @@ class SendLogDAO @Inject() (@NamedDatabase("storage") dbConfigProvider: Database
     def sender = column[String]("SENDER")
     def destination = column[String]("DESTINATION")
     def message = column[String]("MESSAGE")
-    def sendtime = column[DateTime]("SENDTIME")
+    def sendtime = column[Long]("SENDTIME")
 
     def * = (username, sender, destination, message, sendtime) <> ((SendLogRecord.apply _).tupled, SendLogRecord.unapply)
   }
